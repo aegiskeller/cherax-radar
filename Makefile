@@ -3,7 +3,7 @@ install:
 		pip install -r requirements.txt
 
 test:
-	#python3 -m pytest -vv --cov=corenlp test_corenlp.py
+	python3 -m pytest -vv --cov=coreWeather test_coreWeather.py
 	
 
 lint:
