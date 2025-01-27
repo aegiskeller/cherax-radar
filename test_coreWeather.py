@@ -2,10 +2,10 @@ from coreWeather import download_radar
 
 
 def test_download_radar():
-    assert "Radar obtained" in download_radar("http://www.bom.gov.au/radar/IDR403.gif", "erty.gif")
+    assert "Radar obtained" in download_radar("IDR403.gif", "radar.gif")
 
 def test_fail_radar():
-    assert "Radar obtained" in download_radar("http://www.rabbits.com/fridge.jpg", "erty.gif")
+    assert "Radar failed" in download_radar("fridge.jpg", "radar.gif")
 
 
 #def test_get_text_blob():
