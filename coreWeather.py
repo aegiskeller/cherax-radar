@@ -1,6 +1,7 @@
 from ftplib import FTP
 from PIL import Image
 import math
+from datetime import datetime
 
 def download_radar(src_filename, dst_filename):
     """
@@ -57,7 +58,17 @@ def count_rain_pixels(xc,yc,radius):
                 if  pixels[x,y] == rain_index[ri] and math.sqrt((x - xc) ** 2 + (y - yc) ** 2) <=radius:
                     count_in_radius[ri]+=1
         count_in_radius[ri]/=numpx_in_radius
-    print(count_in_radius)
+    return([radius] + count_in_radius)
+
+def store_rain_pixels(px_count):
+    # and the time is
+    local_timestamp = datetime.now()
+    formatted_timestamp = local_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+    print(formatted_timestamp)
+    with open('rain_px_results.txt', 'a') as file:
+        file.write('\n'+formatted_timestamp + ',')
+        file.write(','.join(map(str, px_count)))
+    print('appended results to rain_px_results.txt')
 
 # Example usage
 #image_url = "http://www.bom.gov.au/radar/IDR403.gif"
