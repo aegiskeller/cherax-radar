@@ -68,12 +68,14 @@ def count_rain_pixels(xc,yc,radius):
         count_in_radius[ri]/=numpx_in_radius
     return([radius] + count_in_radius)
 
-def store_rain_pixels(px_count):
-    # and the time is
+def store_rain_pixels(px_count, site):
+    """
+    Here we have a simple stub to store the pixel results 
+    the site parameter is here to enable logging for multiple sites
+    """
     local_timestamp = datetime.now()
     formatted_timestamp = local_timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    print(formatted_timestamp)
-    with open('rain_px_results.txt', 'a') as file:
+    with open(f'rain_px_results_{site}.txt', 'a') as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
-    print('appended results to rain_px_results.txt')
+    print(f'appended results to rain_px_results_{site}.txt')

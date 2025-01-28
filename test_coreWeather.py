@@ -14,10 +14,3 @@ def test_transform_radar():
 def test_fail_transform_radar():
     download_radar("IDR403.gif", "radar.gif")
     assert "masked image failed" in transform_radar('radart.gif')
-
-#def test_get_text_blob():
-#    assert "farrk" == get_text_blob("farrk")
-
-
-#def test_get_phrases():
-#    assert "francophonie" in get_phrases("Franco")

@@ -171,6 +171,7 @@ cython_debug/
 .pypirc
 
 *.gif
+rain_px_results*
 *.vscode
 *.jpg
 *.jpeg
