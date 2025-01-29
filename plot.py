@@ -14,26 +14,34 @@ def plot_rain_pixels(site):
     # Read the data from the file
     file_path = f'rain_px_results_{site}.txt'
     data = pd.read_csv(file_path, header=None, names=['timestamp'] + ['radius']
-                       + [f'col_{i}' for i in range(1, 15)])
+                       + [f'int_{i}' for i in range(1, 15)])
     
     # Convert the timestamp column to datetime
     data['timestamp'] = pd.to_datetime(data['timestamp'])
-    print(data.head())
-# Plot the data
-    plt.figure(figsize=(10, 6))
-    for i, col in enumerate(data.columns[2:]):
+    #print(data.head())
+    # Calculate the sum of rain pixel columns
+    data['sum'] = data.iloc[:, 2:].sum(axis=1)
+    
+    # Calculate the moving average (5 time steps)
+    data['moving_avg'] = data['sum'].rolling(window=5).mean()
+    # Plot the data
+    plt.figure(figsize=(8, 6))
+    for i, col in enumerate(data.columns[2:15]):
         plt.plot(data['timestamp'], data[col], label=col, color=[c/255 for c in rain_index[i]])
         
+    # Plot the moving average
+    plt.plot(data['timestamp'], data['moving_avg'], label='Mv Avg', color='black', linewidth=2)
+
     plt.xlabel('Time')
     plt.ylabel('Fraction of Region with Rain Pixels')
     plt.title(f'Rain Pixel Count Over Time for {site}')
-    #plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(bbox_to_anchor=(0.90, 1), loc='upper left')
     plt.grid(True)
     
     # Save the plot as a PNG file
     output_file = f'rain_px_plot_{site}.png'
     plt.savefig(output_file)
-    print(f'Plot saved as {output_file}')
+    return(f'Plot saved as {output_file}')
 
 # Example usage
 # plot_rain_pixels('example_site')
