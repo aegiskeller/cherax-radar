@@ -7,19 +7,15 @@ def download_radar(src_filename, dst_filename):
     """
     Australian BOM has the lovely ftp repo of radar images
     The radar of interest to us is IDR403 for the Canberra region
-    """
-    try:
-        ftp = FTP('ftp.bom.gov.au')
-        ftp.login()
-        ftp.cwd('anon/gen/radar')
-        with open(dst_filename, "wb") as file: 
-            ftp.retrbinary(f"RETR {src_filename}", file.write)
-        ftp.quit()
-        print(f"Image successfully downloaded: {src_filename}")
-        return('Radar obtained')
-    except Exception as e:
-        print(f"Failed to download image: {e}")
-        return('Radar failed')
+    """    
+    ftp = FTP('ftp.bom.gov.au')
+    ftp.login()
+    ftp.cwd('anon/gen/radar')
+    with open(dst_filename, "wb") as file: 
+        ftp.retrbinary(f"RETR {src_filename}", file.write)
+    ftp.quit()
+    print(f"Image successfully downloaded: {src_filename}")
+    return('Radar obtained')
 
 def transform_radar(radar_image):
     """
@@ -41,8 +37,8 @@ def transform_radar(radar_image):
         masked_image.save('masked.gif')
         print('generated masked image')
         return('generated masked image')
-    except Exception as e:
-        return(f'masked image failed: {e}')
+    except FileNotFoundError:
+        return('masked image failed')
 
 
 def count_rain_pixels(xc,yc,radius):
@@ -54,10 +50,11 @@ def count_rain_pixels(xc,yc,radius):
     count_in_radius = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     numpx_in_radius = 0 
     image = Image.open('masked.gif').convert("RGB")
-    pixels = image.load()# how much of the full image is within the radius? 
+    pixels = image.load()
+    # how much of the full image is within the radius? 
     for y in range(image.height-100):
         for x in range(image.width):
-         if math.sqrt((x - xc) ** 2 + (y - yc) ** 2) <=radius:
+            if math.sqrt((x - xc) ** 2 + (y - yc) ** 2) <=radius:
                 numpx_in_radius +=1
     #print(numpx_in_radius)
     for ri in range(len(rain_index)):
@@ -75,7 +72,7 @@ def store_rain_pixels(px_count, site):
     """
     local_timestamp = datetime.now()
     formatted_timestamp = local_timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    with open(f'rain_px_results_{site}.txt', 'a') as file:
+    with open(f'rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
     print(f'appended results to rain_px_results_{site}.txt')
