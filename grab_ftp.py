@@ -2,6 +2,7 @@ from ftplib import FTP
 from datetime import datetime
 import os
 import argparse
+from PIL import Image
 
 
 def download_most_recent_file(product_id, local_file_path):
@@ -46,6 +47,26 @@ def download_most_recent_file(product_id, local_file_path):
     
     # Close the connection
     ftp.quit()
+    return(local_file_path+file_extension)
+
+
+def create_subimage(input_image_path, output_image_path, crop_box):
+    """
+    Creates a subimage from the input image by cropping the specified region.
+    
+    :param input_image_path: The path to the input image file.
+    :param output_image_path: The path to save the cropped subimage.
+    :param crop_box: A tuple (left, upper, right, lower) defining the region to crop.
+    """
+    # Open the input image
+    with Image.open(input_image_path) as img:
+        # Crop the image
+        subimage = img.crop(crop_box)
+        
+        # Save the subimage
+        subimage.save(output_image_path)
+        print(f'Subimage saved to {output_image_path}')
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Download the most recent file with a specific prefix from an FTP site.')
@@ -54,4 +75,5 @@ if __name__ == '__main__':
     
     args = parser.parse_args()
     
-    download_most_recent_file(args.product_id, args.local_file_path)
+    raw_image = download_most_recent_file(args.product_id, args.local_file_path)
+    create_subimage(raw_image, 'subimage.png', (3000, 2500, 4000, 3500))
