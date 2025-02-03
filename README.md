@@ -14,3 +14,13 @@ e.g. https://www.skippysky.com.au/SE_Australia/transparency/seaus_006_tran.png
 
 Creating a web page to hold the pertainent information:
 generate_web_page('rain_px_plot_IDR403.png', 'erty.html')
+
+## GCP deploy
+
+sudo apt-get update
+curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+sudo apt-get update && sudo apt-get install google-cloud-cli
+gcloud init
+
+gcloud app deploy
