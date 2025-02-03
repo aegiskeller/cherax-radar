@@ -1,6 +1,6 @@
 from coreWeather import download_radar, transform_radar, count_rain_pixels, store_rain_pixels
-#site = 'IDR403' # Captain's Flat NSW
-site = 'IDR163' # Pt Headland WA
+site = 'IDR403' # Captain's Flat NSW
+#site = 'IDR163' # Pt Headland WA
 
 download_radar(site+'.gif', 'radar'+site+'.gif')
 

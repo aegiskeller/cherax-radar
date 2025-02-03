@@ -92,3 +92,5 @@ def generate_web_page(image_path, output_html_path):
 
 # Example usage
 # generate_web_page('rain_px_plot_IDR403.png', 'weather_watch.html')
+if __name__ == "__main__":
+    generate_web_page('rain_px_plot_IDR403.png', 'weather_watch.html')
