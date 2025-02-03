@@ -39,7 +39,7 @@ def plot_rain_pixels(site):
     plt.grid(True)
     
     # Save the plot as a PNG file
-    output_file = f'rain_px_plot_{site}.png'
+    output_file = f'static/rain_px_plot_{site}.png'
     plt.savefig(output_file)
     return(f'Plot saved as {output_file}')
 

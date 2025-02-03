@@ -72,7 +72,7 @@ def store_rain_pixels(px_count, site):
     """
     local_timestamp = datetime.now()
     formatted_timestamp = local_timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    with open(f'rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
+    with open(f'static/rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
-    print(f'appended results to rain_px_results_{site}.txt')
+    print(f'appended results to static/rain_px_results_{site}.txt')

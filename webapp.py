@@ -6,12 +6,26 @@ app = Flask(__name__)
 
 def get_cloud_model():
     from datetime import datetime, timedelta
+    from coreWeather import download_radar, transform_radar, count_rain_pixels, store_rain_pixels
+    from plot import plot_rain_pixels
     """
     Fetches the cloud coverage model from an external source.
     
     :return: The cloud coverage model as a NumPy array.
     """
-    # Get the current time in UTC
+    site = 'IDR403' # Captain's Flat NSW
+    #site = 'IDR163' # Pt Headland WA
+
+    download_radar(site+'.gif', 'radar'+site+'.gif')
+
+    transform_radar('radar'+site+'.gif')
+
+    pixel_cnt = count_rain_pixels(256,256,100)
+
+    store_rain_pixels(pixel_cnt, site)    # Get the current time in UTC
+
+    plot_rain_pixels(site)
+
     now_utc = datetime.utcnow()
     
     # Calculate the last midnight in UTC

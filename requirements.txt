@@ -6,3 +6,6 @@ pylint
 pytest-cov
 black
 Pillow
+matplotlib
+pandas
+argparse
