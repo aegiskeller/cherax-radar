@@ -9,6 +9,7 @@ rain_index = [(180,180,255), (120,120,255), (20,20,255), (0, 216, 195), (0, 150,
 def plot_rain_pixels(site):
     """
     This function reads the rain pixel results from the file and plots time vs. columns.
+    The RGB values rain_index are used in tahe plot to be consistent with the original radar image
     The plot is saved as a PNG file.
     """
     # Read the data from the file
