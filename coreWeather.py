@@ -34,7 +34,7 @@ def transform_radar(radar_image):
                 for x in range(image.width):
                     if pixels[x,y] == rain_index[ri]:
                         masked_pixels[x, y] = pixels[x, y]
-        masked_image.save('resources/masked.gif')
+        masked_image.save('static/masked.gif')
         print('generated masked image')
         return('generated masked image')
     except FileNotFoundError:
@@ -49,7 +49,7 @@ def count_rain_pixels(xc,yc,radius):
     rain_index = [(180,180,255), (120,120,255), (20,20,255), (0, 216, 195), (0, 150, 144), (0, 102, 102), (255, 255, 0), (255,200,0), (255,150,0), (255,100,0), (255,0,0), (200,0,0), (120,0,0), (40,0,0)]
     count_in_radius = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     numpx_in_radius = 0 
-    image = Image.open('resources/masked.gif').convert("RGB")
+    image = Image.open('static/masked.gif').convert("RGB")
     pixels = image.load()
     # how much of the full image is within the radius? 
     for y in range(image.height-100):
@@ -72,7 +72,7 @@ def store_rain_pixels(px_count, site):
     """
     local_timestamp = datetime.now()
     formatted_timestamp = local_timestamp.strftime('%Y-%m-%d %H:%M:%S')
-    with open(f'resources/rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
+    with open(f'static/rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
-    print(f'appended results to resources/rain_px_results_{site}.txt')
+    print(f'appended results to static/rain_px_results_{site}.txt')

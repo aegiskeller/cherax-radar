@@ -13,7 +13,7 @@ def plot_rain_pixels(site):
     The plot is saved as a PNG file.
     """
     # Read the data from the file
-    file_path = f'resources/rain_px_results_{site}.txt'
+    file_path = f'static/rain_px_results_{site}.txt'
     data = pd.read_csv(file_path, header=None, names=['timestamp'] + ['radius']
                        + [f'int_{i}' for i in range(1, 15)])
     
@@ -40,7 +40,7 @@ def plot_rain_pixels(site):
     plt.grid(True)
     
     # Save the plot as a PNG file
-    output_file = f'resources/rain_px_plot_{site}.png'
+    output_file = f'static/rain_px_plot_{site}.png'
     plt.savefig(output_file)
     return(f'Plot saved as {output_file}')
 

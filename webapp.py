@@ -14,22 +14,6 @@ def get_cloud_model():
     
     :return: The cloud coverage model as a NumPy array.
     """
-    site = 'IDR403' # Captain's Flat NSW
-    #site = 'IDR163' # Pt Headland WA
-    # Check if the 'resources' directory exists, if not create it
-    if not os.path.exists('resources'):
-        os.makedirs('resources')
-
-    download_radar(site+'.gif', 'resources/radar'+site+'.gif')
-
-    transform_radar('resources/radar'+site+'.gif')
-
-    pixel_cnt = count_rain_pixels(256,256,100)
-
-    store_rain_pixels(pixel_cnt, site)    # Get the current time in UTC
-
-    plot_rain_pixels(site)
-
     now_utc = datetime.utcnow()
     
     # Calculate the last midnight in UTC
