@@ -1,6 +1,7 @@
 from coreWeather import download_radar, transform_radar, count_rain_pixels, store_rain_pixels
 from time import sleep
 import shutil
+import os
 
 site = 'IDR403' # Captain's Flat NSW
 #site = 'IDR163' # Pt Headland WA
