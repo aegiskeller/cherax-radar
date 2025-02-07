@@ -62,7 +62,7 @@ def hello() -> str:
             }}
             .panel {{
                 background-color: #1e1e1e;
-                padding: 20px;
+                padding: 50px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
                 text-align: center;
             }}
