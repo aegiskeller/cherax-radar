@@ -66,11 +66,11 @@ def generate_web_page(image_path, output_html_path):
         <div class="container">
             <div class="panel">
                 <h2>Rain Pixel Plot</h2>
-                <img src="rain_px_plot_IDR403.png" alt="Rain Pixel Plot">
+                <img src="static/rain_px_plot_IDR403.png" alt="Rain Pixel Plot">
             </div>
             <div class="panel">
                 <h2>Rain Radar Map</h2>
-                <img src="radarIDR403.gif" alt="Rain Radar Map">
+                <img src="static/radarIDR403.gif" alt="Rain Radar Map">
             </div>
             <div class="panel">
                 <h2>Cloud Coverage Model</h2>
