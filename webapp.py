@@ -1,6 +1,7 @@
 from flask import Flask
 from datetime import datetime
-
+import os
+from flask import url_for
 
 app = Flask(__name__)
 
@@ -15,10 +16,13 @@ def get_cloud_model():
     """
     site = 'IDR403' # Captain's Flat NSW
     #site = 'IDR163' # Pt Headland WA
+    # Check if the 'resources' directory exists, if not create it
+    if not os.path.exists('resources'):
+        os.makedirs('resources')
 
-    download_radar(site+'.gif', 'radar'+site+'.gif')
+    download_radar(site+'.gif', 'resources/radar'+site+'.gif')
 
-    transform_radar('radar'+site+'.gif')
+    transform_radar('resources/radar'+site+'.gif')
 
     pixel_cnt = count_rain_pixels(256,256,100)
 
@@ -47,6 +51,10 @@ def hello() -> str:
     <html lang="en">
     <head>
         <meta charset="UTF-8">
+        <link rel="apple-touch-icon" sizes="180x180" href="{url_for('static', filename='apple-touch-icon.png')}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{url_for('static', filename='favicon-32x32.png')}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{url_for('static', filename='favicon-16x16.png')}">
+        <link rel="manifest" href="/site.webmanifest">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Weather Watch</title>
         <style>
@@ -84,11 +92,11 @@ def hello() -> str:
         <div class="container">
             <div class="panel">
                 <h2>Rain Pixel Plot</h2>
-                <img src="/static/rain_px_plot_IDR403.png" alt="Rain Pixel Plot">
+                <img src="{url_for('static', filename='rain_px_plot_IDR403.png')}" alt="Rain Pixel Plot">
             </div>
             <div class="panel">
                 <h2>Rain Radar Map</h2>
-                <img src="/static/radarIDR403.gif" alt="Rain Radar Map">
+                <img src="{url_for('static', filename='radarIDR403.gif')}" alt="Rain Radar Map">
             </div>
             <div class="panel">
                 <h2>Cloud Coverage Model</h2>
