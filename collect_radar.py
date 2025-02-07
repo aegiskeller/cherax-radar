@@ -6,9 +6,9 @@ site = 'IDR403' # Captain's Flat NSW
 
 
 while True:
-    download_radar(site+'.gif', 'radar'+site+'.gif')
+    download_radar(site+'.gif', 'static/radar'+site+'.gif')
 
-    transform_radar('radar'+site+'.gif')
+    transform_radar('static/radar'+site+'.gif')
 
     pixel_cnt = count_rain_pixels(256,256,100)
 
