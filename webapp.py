@@ -67,7 +67,7 @@ def hello() -> str:
                 text-align: center;
             }}
             .panel img {{
-                max-width: 100%;
+                max-width: 95%;
                 height: auto;
             }}
         </style>
