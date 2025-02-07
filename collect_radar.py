@@ -16,8 +16,11 @@ while True:
     store_rain_pixels(pixel_cnt, site)
 
     source_folder = '/home/aegiskeller/cherax-radar/static'
-    destination_folder = '/var/www/html'
+    destination_folder = '/var/www/html/static'
 
     # Copy the entire folder to the destination
+# Check if the destination folder exists and remove it
+    if os.path.exists(destination_folder):
+        shutil.rmtree(destination_folder)
     shutil.copytree(source_folder, destination_folder)    
     sleep(300)
