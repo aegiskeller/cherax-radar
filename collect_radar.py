@@ -16,7 +16,7 @@ while True:
     store_rain_pixels(pixel_cnt, site)
 
     source_folder = '/home/aegiskeller/cherax-radar/static'
-    destination_folder = '/var/www/hmtl'
+    destination_folder = '/var/www/html'
 
     # Copy the entire folder to the destination
     shutil.copytree(source_folder, destination_folder)    
