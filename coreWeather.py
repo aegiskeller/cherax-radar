@@ -96,12 +96,18 @@ def recommended_action(site):
     # Calculate the moving average (5 time steps)
     data['moving_avg'] = data['sum'].rolling(window=5).mean()
     cloud_trend = 'trend not clear'
-    if data['moving_avg'].iloc[-1] > data['moving_avg'].iloc[-2] and data['moving_avg'].iloc[-1] > data['moving_avg'].iloc[-3] and data['moving_avg'].iloc[-1]:
-        print(f'Condition is worsening for {site}')
-        cloud_trend = 'worsening'
-    if data['moving_avg'].iloc[-1] < data['moving_avg'].iloc[-2] and data['moving_avg'].iloc[-1] < data['moving_avg'].iloc[-3] and data['moving_avg'].iloc[-1]:
-        print(f'Condition is improving for {site}')
-        cloud_trend = 'improving'
+    try:
+        d1 = data['moving_avg'].iloc[-5] - data['moving_avg'].iloc[-10]
+        d2 = data['moving_avg'].iloc[-10] - data['moving_avg'].iloc[-15]
+        print(d1, d2)   
+        if d1 > 0.01 and d2 > 0.01:
+            print(f'Condition is worsening for {site}')
+            cloud_trend = 'worsening'
+        if d1 < -0.01 and d2 < -0.01:
+            print(f'Condition is improving for {site}')
+            cloud_trend = 'improving'
+    except:
+        print('Not enough data to determine trend')
     obs_status = 'close undefined'
     if data['moving_avg'].iloc[-1] > 0.1:
         print(f'Close Action recommended for {site}')
