@@ -2,6 +2,7 @@ from ftplib import FTP
 from PIL import Image
 import math
 from datetime import datetime
+import pandas as pd
 
 def download_radar(src_filename, dst_filename):
     """
@@ -75,4 +76,38 @@ def store_rain_pixels(px_count, site):
     with open(f'static/rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
-    print(f'appended results to static/rain_px_results_{site}.txt')
+    return(f'appended results to static/rain_px_results_{site}.txt')
+
+def recommended_action(site):
+    """
+    Here we recommend an action based on the pixel results
+    """
+    # Read the data from the file
+    file_path = f'static/rain_px_results_{site}.txt'
+    data = pd.read_csv(file_path, header=None, names=['timestamp'] + ['radius']
+                       + [f'int_{i}' for i in range(1, 15)])
+    
+    # Convert the timestamp column to datetime
+    data['timestamp'] = pd.to_datetime(data['timestamp'])
+    #print(data.head())
+    # Calculate the sum of rain pixel columns
+    data['sum'] = data.iloc[:, 2:].sum(axis=1)
+    
+    # Calculate the moving average (5 time steps)
+    data['moving_avg'] = data['sum'].rolling(window=5).mean()
+    cloud_trend = 'trend not clear'
+    if data['moving_avg'].iloc[-1] > data['moving_avg'].iloc[-2] and data['moving_avg'].iloc[-1] > data['moving_avg'].iloc[-3] and data['moving_avg'].iloc[-1]:
+        print(f'Condition is worsening for {site}')
+        cloud_trend = 'worsening'
+    if data['moving_avg'].iloc[-1] < data['moving_avg'].iloc[-2] and data['moving_avg'].iloc[-1] < data['moving_avg'].iloc[-3] and data['moving_avg'].iloc[-1]:
+        print(f'Condition is improving for {site}')
+        cloud_trend = 'improving'
+    obs_status = 'close undefined'
+    if data['moving_avg'].iloc[-1] > 0.1:
+        print(f'Close Action recommended for {site}')
+        obs_status = 'close'
+    else:
+        print(f'Open Action recommended for {site}')
+        obs_status = 'open'
+    print(f'{site} - {cloud_trend} - {obs_status}')
+    return(f'{site} - {cloud_trend} - {obs_status}')
