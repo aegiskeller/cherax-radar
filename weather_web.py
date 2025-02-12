@@ -1,3 +1,6 @@
+from coreWeather import recommended_action
+
+
 def get_cloud_model():
     from datetime import datetime, timedelta
     """
@@ -24,6 +27,8 @@ def generate_web_page(image_path, output_html_path):
     :param output_html_path: The path to save the generated HTML file.
     """
     cloud_model = get_cloud_model()
+    rec_action = recommended_action('IDR403')
+
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -77,8 +82,8 @@ def generate_web_page(image_path, output_html_path):
                 <img src="{cloud_model}" alt="Cloud Coverage Model">
             </div>
             <div class="panel">
-                <h2>Wind Speed Map</h2>
-                <img src="https://example.com/wind_speed_map.png" alt="Wind Speed Map">
+                <h2>Recommended Action</h2>
+                <p>{rec_action}</p>
             </div>
         </div>
     </body>

@@ -2,6 +2,7 @@ from ftplib import FTP
 from PIL import Image
 import math
 from datetime import datetime
+import pandas as pd
 
 def download_radar(src_filename, dst_filename):
     """
@@ -34,7 +35,7 @@ def transform_radar(radar_image):
                 for x in range(image.width):
                     if pixels[x,y] == rain_index[ri]:
                         masked_pixels[x, y] = pixels[x, y]
-        masked_image.save('masked.gif')
+        masked_image.save('static/masked.gif')
         print('generated masked image')
         return('generated masked image')
     except FileNotFoundError:
@@ -49,7 +50,7 @@ def count_rain_pixels(xc,yc,radius):
     rain_index = [(180,180,255), (120,120,255), (20,20,255), (0, 216, 195), (0, 150, 144), (0, 102, 102), (255, 255, 0), (255,200,0), (255,150,0), (255,100,0), (255,0,0), (200,0,0), (120,0,0), (40,0,0)]
     count_in_radius = [0,0,0,0,0,0,0,0,0,0,0,0,0,0]
     numpx_in_radius = 0 
-    image = Image.open('masked.gif').convert("RGB")
+    image = Image.open('static/masked.gif').convert("RGB")
     pixels = image.load()
     # how much of the full image is within the radius? 
     for y in range(image.height-100):
@@ -75,4 +76,44 @@ def store_rain_pixels(px_count, site):
     with open(f'static/rain_px_results_{site}.txt', 'a', encoding="utf-8") as file:
         file.write('\n'+formatted_timestamp + ',')
         file.write(','.join(map(str, px_count)))
-    print(f'appended results to static/rain_px_results_{site}.txt')
+    return(f'appended results to static/rain_px_results_{site}.txt')
+
+def recommended_action(site):
+    """
+    Here we recommend an action based on the pixel results
+    """
+    # Read the data from the file
+    file_path = f'static/rain_px_results_{site}.txt'
+    data = pd.read_csv(file_path, header=None, names=['timestamp'] + ['radius']
+                       + [f'int_{i}' for i in range(1, 15)])
+    
+    # Convert the timestamp column to datetime
+    data['timestamp'] = pd.to_datetime(data['timestamp'])
+    #print(data.head())
+    # Calculate the sum of rain pixel columns
+    data['sum'] = data.iloc[:, 2:].sum(axis=1)
+    
+    # Calculate the moving average (5 time steps)
+    data['moving_avg'] = data['sum'].rolling(window=5).mean()
+    cloud_trend = 'trend not clear'
+    try:
+        d1 = data['moving_avg'].iloc[-5] - data['moving_avg'].iloc[-10]
+        d2 = data['moving_avg'].iloc[-10] - data['moving_avg'].iloc[-15]
+        print(d1, d2)   
+        if d1 > 0.01 and d2 > 0.01:
+            print(f'Condition is worsening for {site}')
+            cloud_trend = 'worsening'
+        if d1 < -0.01 and d2 < -0.01:
+            print(f'Condition is improving for {site}')
+            cloud_trend = 'improving'
+    except:
+        print('Not enough data to determine trend')
+    obs_status = 'close undefined'
+    if data['moving_avg'].iloc[-1] > 0.1:
+        print(f'Close Action recommended for {site}')
+        obs_status = 'close'
+    else:
+        print(f'Open Action recommended for {site}')
+        obs_status = 'open'
+    print(f'{site} - {cloud_trend} - {obs_status}')
+    return(f'{site} - {cloud_trend} - {obs_status}')

@@ -179,3 +179,5 @@ rain_px_results*
 *.tif
 rain_px_results.txt
 *.html
+!static/favicon*
+*webmanifest
