@@ -218,6 +218,9 @@ def recommended_action(site):
             cloud_trend = "improving"
     except:
         print("Not enough data to determine trend")
+    # additonally if there really is not cloud around then show it is clear
+    if data["moving_avg"].iloc[-1] < 0.01:
+        cloud_trend = "clear"
     obs_status = "close undefined"
     if data["moving_avg"].iloc[-1] > 0.1:
         print(f"Close Action recommended for {site}")
