@@ -246,7 +246,7 @@ def get_cloud_model():
     hrs = format(hours_until_midnight, "03")
     return f"https://cloudfreenight.au/images/map/GFS_seaus_{hrs}_cct.png"
 
-def generate_web_page(image_path, output_html_path):
+def generate_web_page(recommendation, output_html_path):
     """
     Generates a web page with the title 'Weather Watch' and includes the specified image.
 
@@ -254,8 +254,6 @@ def generate_web_page(image_path, output_html_path):
     :param output_html_path: The path to save the generated HTML file.
     """
     cloud_model = get_cloud_model()
-    rec_action = recommended_action("IDR403")
-
     html_content = f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -310,7 +308,7 @@ def generate_web_page(image_path, output_html_path):
             </div>
             <div class="panel">
                 <h2>Recommended Action</h2>
-                <p>{rec_action}</p>
+                <p>{recommendation}</p>
             </div>
         </div>
     </body>
@@ -318,6 +316,6 @@ def generate_web_page(image_path, output_html_path):
     """
 
     # Write the HTML content to the output file
-    with open(output_html_path, "w") as html_file:
+    with open(output_html_path+"/weather_watch.html", "w") as html_file:
         html_file.write(html_content)
     print(f"Web page generated successfully at {output_html_path}")
