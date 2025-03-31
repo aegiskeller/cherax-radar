@@ -1,10 +1,37 @@
 from ftplib import FTP
 from PIL import Image
+import requests
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 import matplotlib.pyplot as plt
+from astral import LocationInfo
+from astral.sun import sun
 
+def get_evening_twilight_time():
+    """
+    Calculate the time of evening twilight for a given location.
+
+    :param city_name: Name of the city (for reference)
+    :param latitude: Latitude of the location
+    :param longitude: Longitude of the location
+    :param timezone: Timezone of the location
+    :return: Evening twilight time as a datetime object
+    """
+    city_name = "Canberra"
+    latitude = -35.2809
+    longitude = 149.1300
+    timezone = "Australia/Sydney"
+
+    # location = LocationInfo(city_name, timezone, latitude, longitude)
+    # s = sun(location.observer, date=datetime.now())
+    # return s['dusk']  # Evening twilight time (dusk)
+    #return the time of 20:00 as a utc datetime object and convert to utc
+    import pytz
+    sydney_tz = pytz.timezone("Australia/Sydney")
+    evening_twilight = datetime.now(sydney_tz).replace(hour=20, minute=0, second=0, microsecond=0)
+    return evening_twilight.astimezone(pytz.utc)
+    
 
 
 def download_radar(src_filename, dst_filename):
@@ -103,6 +130,7 @@ def count_rain_pixels(xc, yc, radius):
         count_in_radius[ri] /= numpx_in_radius
     return [radius] + count_in_radius
 
+
 def plot_rain_pixels(site):
     """
     This function reads the rain pixel results from the file and plots time vs. columns.
@@ -135,7 +163,8 @@ def plot_rain_pixels(site):
 
     # Convert the timestamp column to datetime
     data["timestamp"] = pd.to_datetime(data["timestamp"])
-    # print(data.head())
+    # only retain those rows with timestamps no older than 2 days
+    data = data[data["timestamp"] > datetime.now() - timedelta(days=2)]
     # Calculate the sum of rain pixel columns
     data["sum"] = data.iloc[:, 2:].sum(axis=1)
 
@@ -177,7 +206,7 @@ def store_rain_pixels(px_count, site):
     Here we have a simple stub to store the pixel results
     the site parameter is here to enable logging for multiple sites
     """
-    local_timestamp = datetime.now()
+    local_timestamp = datetime.now(timezone.utc).astimezone(timezone(('Australia/Sydney')))
     formatted_timestamp = local_timestamp.strftime("%Y-%m-%d %H:%M:%S")
     with open(f"static/rain_px_results_{site}.txt", "a", encoding="utf-8") as file:
         file.write("\n" + formatted_timestamp + ",")
@@ -231,23 +260,82 @@ def recommended_action(site):
     print(f"{site} - {cloud_trend} - {obs_status}")
     return f"{site} - {cloud_trend} - {obs_status}"
 
-def get_cloud_model():
 
+def get_cloud_model(mode="twilight"):
     """
     Fetches the cloud coverage model from an external source.
-    
+    The URL is constructed based on the current time in UTC if mode is "latest".
+    other modes are 'twilight'
     :return: The cloud coverage model as a NumPy array.
     """
-    # Get the current time in UTC
-    now_utc = datetime.utcnow()
+    if mode == "latest":
+        # Get the current time in UTC
+        now_utc = datetime.now(timezone.utc)
+    elif mode == "twilight":
+        # determine twilight time
+        evening_twilight = get_evening_twilight_time().astimezone(timezone.utc)
+        now_utc = evening_twilight
 
     # Calculate the last midnight in UTC
-    last_midnight_utc = datetime(now_utc.year, now_utc.month, now_utc.day)
+    last_midnight_utc = datetime(
+        now_utc.year, now_utc.month, now_utc.day, 0, 0, 0, tzinfo=timezone.utc 
+    )
+    print (f"Last midnight UTC: {last_midnight_utc}")
+    print (f"Now UTC: {now_utc}")
     # Calculate the difference in hours
     hours_until_midnight = int((now_utc - last_midnight_utc).total_seconds() / 3600)
     # https://cloudfreenight.au/images/map/GFS_seaus_012_cct.png
     hrs = format(hours_until_midnight, "03")
     return f"https://cloudfreenight.au/images/map/GFS_seaus_{hrs}_cct.png"
+
+def examine_cloud_model(site, url):
+    """
+    Examines the cloud coverage model by downloading it and then looking
+    at the coordinates of the site in the image.
+
+    :param url: The URL of the cloud coverage model image.
+    :param site: The site name (e.g., "IDR403").
+    :return: The median pixel value around the site in the image.
+    """
+    print(url)
+    # Download the image
+    image = Image.open(requests.get(url, stream=True).raw)
+    # Convert the image to RGB
+    image = image.convert("RGB")
+    # Get the pixel data
+    pixels = image.load()
+    # find the median pixel value in a box around the site
+    if site == "IDR403":
+        xc = 490 # x coordinate of the site
+        yc = 330 # y coordinate of the site
+    else:
+        xc = 256 # x coordinate of the site
+        yc = 256 # y coordinate of the site 
+    pixel_values = []
+    for y in range(yc - 10, yc + 10):
+        for x in range(xc - 10, xc + 10):
+            pixel_values.append(pixels[x, y])
+    # Calculate the median pixel value
+    median_pixel = tuple(map(int, [sum(x) // len(x) for x in zip(*pixel_values)]))
+    print(f"Median pixel value around site: {median_pixel}")
+    # Check if the pixel value is close to blue (indicating clear sky)
+    # blue is (0, 0, 255) and cloudy is (255, 255, 255)
+    # if the pixel is close to blue then it is clear
+    if abs(median_pixel[0] - 0) < 50 and abs(median_pixel[1] - 0) < 50 and abs(median_pixel[2] - 255) < 50:
+        print(f"The sky is clear at {site}.")
+    else:
+        print(f"The sky is cloudy at {site}.")
+    # make a patch of the image to show the site
+    patch_size = 20
+    patch = Image.new("RGB", (patch_size, patch_size), median_pixel)
+    for y in range(patch_size):
+        for x in range(patch_size):
+            if (x, y) in pixel_values:
+                patch.putpixel((x, y), median_pixel)
+    patch.save(f"static/cloud_patch_{site}.png")
+    # save the image
+    image.save(f"static/cloud_model_{site}.png")
+    return median_pixel
 
 def generate_web_page(recommendation, output_html_path):
     """
@@ -319,6 +407,6 @@ def generate_web_page(recommendation, output_html_path):
     """
 
     # Write the HTML content to the output file
-    with open(output_html_path+"/weather_watch.html", "w") as html_file:
+    with open(output_html_path + "/weather_watch.html", "w") as html_file:
         html_file.write(html_content)
     print(f"Web page generated successfully at {output_html_path}")

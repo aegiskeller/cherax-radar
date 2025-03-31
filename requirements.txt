@@ -9,3 +9,7 @@ Pillow
 matplotlib
 pandas
 argparse
+requests
+numpy
+astral
+pytz
